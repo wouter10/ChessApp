@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <!-- Mobile-first: scale to device width, allow the board to fill the screen -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Chess Game Analyzer</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="app__header">
+      <h1>♟ Chess Game Analyzer</h1>
+      <p class="muted">Paste a Chess.com PGN, step through the game, and let Claude explain what happened.</p>
+    </header>
+
+    <!-- ── API key (stored locally, never hard-coded) ───────────────────── -->
+    <details class="card" id="keyCard">
+      <summary>API key &amp; settings</summary>
+      <label class="field">
+        <span>Anthropic API key</span>
+        <input type="password" id="apiKey" placeholder="sk-ant-..." autocomplete="off" />
+      </label>
+      <label class="field">
+        <span>Explain in</span>
+        <select id="language">
+          <option value="English">English</option>
+          <option value="Dutch">Nederlands (Dutch)</option>
+        </select>
+      </label>
+      <div class="row">
+        <button id="saveKey" class="btn btn--ghost">Save key</button>
+        <span class="muted small">Stored only in this browser (localStorage).</span>
+      </div>
+    </details>
+
+    <!-- ── PGN input ────────────────────────────────────────────────────── -->
+    <section class="card">
+      <label class="field">
+        <span>Game PGN</span>
+        <textarea id="pgn" rows="6" placeholder="Paste the PGN you exported from Chess.com here..."></textarea>
+      </label>
+      <div class="row">
+        <button id="loadGame" class="btn">Load game</button>
+        <button id="loadSample" class="btn btn--ghost">Try a sample</button>
+      </div>
+      <p id="loadError" class="error" hidden></p>
+    </section>
+
+    <!-- ── Board + game view (hidden until a game is loaded) ─────────────── -->
+    <section class="card" id="gameView" hidden>
+      <div class="players" id="players"></div>
+
+      <div class="board-wrap">
+        <div id="board" class="board" aria-label="Chess board"></div>
+      </div>
+
+      <div class="nav">
+        <button id="navFirst" class="btn btn--icon" title="Start">⏮</button>
+        <button id="navPrev"  class="btn btn--icon" title="Previous">◀</button>
+        <span id="moveLabel" class="move-label">Start</span>
+        <button id="navNext"  class="btn btn--icon" title="Next">▶</button>
+        <button id="navLast"  class="btn btn--icon" title="End">⏭</button>
+      </div>
+
+      <div class="youplay">
+        <span class="muted small">You played:</span>
+        <label><input type="radio" name="youplay" value="w" checked /> White</label>
+        <label><input type="radio" name="youplay" value="b" /> Black</label>
+      </div>
+
+      <div id="moveList" class="movelist"></div>
+
+      <div class="row">
+        <button id="analyze" class="btn btn--primary">Analyze with Claude</button>
+      </div>
+      <p id="analyzeStatus" class="muted small" hidden></p>
+      <p id="analyzeError" class="error" hidden></p>
+    </section>
+
+    <!-- ── Analysis output ──────────────────────────────────────────────── -->
+    <section class="card" id="analysisView" hidden>
+      <h2 id="analysisHeadline">Analysis</h2>
+      <p id="analysisSummary" class="summary"></p>
+
+      <div class="analysis-grid">
+        <div class="panel panel--good">
+          <h3>✅ What went well</h3>
+          <ul id="wentWell"></ul>
+        </div>
+        <div class="panel panel--bad">
+          <h3>⚠️ What went wrong</h3>
+          <ul id="wentWrong"></ul>
+        </div>
+        <div class="panel panel--tip">
+          <h3>🎯 Next time</h3>
+          <ul id="tips"></ul>
+        </div>
+      </div>
+
+      <h3>🔑 Key moments</h3>
+      <p class="muted small">Tap a moment to jump the board to that position.</p>
+      <div id="keyMoments" class="keymoments"></div>
+    </section>
+  </main>
+
+  <!-- chess.js (move validation + PGN parsing). Classic script → sets window.Chess.
+       Pinned to 0.12.1: it ships a plain global build, so the app runs straight
+       from the filesystem (newer 0.13+ is ESM-only and needs a build step/server). -->
+  <script src="https://cdn.jsdelivr.net/npm/chess.js@0.12.1/chess.js"></script>
+
+  <!-- App modules. Plain (non-module) scripts so the app runs by just opening
+       index.html from the filesystem — no build step, no local server needed. -->
+  <script src="js/board.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/analysis.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
