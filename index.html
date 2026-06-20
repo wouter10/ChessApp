@@ -34,6 +34,15 @@
       </div>
     </details>
 
+    <!-- ── Game library (hidden when empty) ─────────────────────────────── -->
+    <section class="card" id="libraryCard" hidden>
+      <div class="library__header">
+        <h2 class="library__title">Recent games</h2>
+        <button id="libraryClear" class="btn btn--ghost btn--sm">Clear all</button>
+      </div>
+      <ul id="libraryList" class="library__list"></ul>
+    </section>
+
     <!-- ── PGN input ────────────────────────────────────────────────────── -->
     <section class="card">
       <label class="field">
@@ -111,6 +120,7 @@
 
   <!-- App modules. Plain (non-module) scripts so the app runs by just opening
        index.html from the filesystem — no build step, no local server needed. -->
+  <script src="js/library.js"></script>
   <script src="js/board.js"></script>
   <script src="js/game.js"></script>
   <script src="js/api.js"></script>
