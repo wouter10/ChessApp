@@ -189,6 +189,53 @@ textarea { resize: vertical; }
 .moment .moment__where { color: var(--muted); font-size: 0.8rem; }
 .moment .moment__text { margin: 4px 0 0; font-size: 0.9rem; }
 
+/* ── Game library ──────────────────────────────────────────────────────── */
+.library__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.library__title { margin: 0; font-size: 1rem; }
+.btn--sm { padding: 5px 10px; font-size: 0.8rem; }
+
+.library__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.library__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card-2);
+  border-radius: 8px;
+  padding: 2px 2px 2px 0;
+}
+.library__load {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  padding: 8px 10px;
+  border-radius: 6px;
+  min-width: 0;
+}
+.library__load:hover { background: #2f3a48; }
+.library__matchup { font-size: 0.9rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.library__meta { font-size: 0.75rem; color: var(--muted); }
+.library__del { flex-shrink: 0; color: var(--muted); border-color: transparent; padding: 6px 10px; }
+.library__del:hover { color: var(--bad); border-color: var(--bad); }
+
 /* A little breathing room on wider screens */
 @media (min-width: 480px) {
   .analysis-grid { grid-template-columns: 1fr; }

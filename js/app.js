@@ -13,6 +13,7 @@
 
   var KEY_STORAGE = "claude_api_key";
   var LANG_STORAGE = "analyzer_language";
+  var _currentPgn = "";
 
   // A short sample game (a quick Scholar's-mate-style miniature) so the user can
   // try the app instantly without exporting anything.
@@ -46,6 +47,7 @@
       "moveList", "analyze", "analyzeStatus", "analyzeError",
       "analysisView", "analysisHeadline", "analysisSummary",
       "wentWell", "wentWrong", "tips", "keyMoments",
+      "libraryCard", "libraryList", "libraryClear",
     ].forEach(function (id) { el[id] = $(id); });
   }
 
@@ -89,6 +91,13 @@
     );
 
     el.analyze.addEventListener("click", analyze);
+
+    el.libraryClear.addEventListener("click", function () {
+      Library.all().forEach(function (g) { Library.remove(g.id); });
+      renderLibrary([]);
+    });
+
+    renderLibrary(Library.all());
   }
 
   // ── API key ────────────────────────────────────────────────────────────────
@@ -96,6 +105,52 @@
     localStorage.setItem(KEY_STORAGE, el.apiKey.value.trim());
     el.saveKey.textContent = "Saved ✓";
     setTimeout(function () { el.saveKey.textContent = "Save key"; }, 1200);
+  }
+
+  // ── Library ─────────────────────────────────────────────────────────────────
+  function renderLibrary(list) {
+    el.libraryList.innerHTML = "";
+    if (!list || !list.length) {
+      hide(el.libraryCard);
+      return;
+    }
+    show(el.libraryCard);
+    list.forEach(function (g) {
+      var li = document.createElement("li");
+      li.className = "library__item";
+
+      var info = document.createElement("button");
+      info.className = "library__load";
+      info.setAttribute("aria-label", "Load " + g.white + " vs " + g.black);
+
+      var title = document.createElement("span");
+      title.className = "library__matchup";
+      title.textContent = g.white + " vs " + g.black;
+
+      var meta = document.createElement("span");
+      meta.className = "library__meta";
+      meta.textContent = [g.result, g.date].filter(Boolean).join(" · ");
+
+      info.appendChild(title);
+      info.appendChild(meta);
+      info.addEventListener("click", function () {
+        el.pgn.value = g.pgn;
+        loadGame(g.pgn);
+      });
+
+      var del = document.createElement("button");
+      del.className = "btn btn--ghost btn--sm library__del";
+      del.textContent = "✕";
+      del.setAttribute("aria-label", "Remove game");
+      del.addEventListener("click", function (e) {
+        e.stopPropagation();
+        renderLibrary(Library.remove(g.id));
+      });
+
+      li.appendChild(info);
+      li.appendChild(del);
+      el.libraryList.appendChild(li);
+    });
   }
 
   // ── Loading a game ──────────────────────────────────────────────────────────
@@ -107,10 +162,16 @@
       state.ply = 0;
       state.analysis = null;
       state.keyPlies = {};
+      _currentPgn = pgn.trim();
 
       hide(el.analysisView);
       hide(el.analyzeError);
       hide(el.analyzeStatus);
+
+      // Persist to library (skip the built-in sample game).
+      if (pgn.trim() !== SAMPLE_PGN.trim()) {
+        renderLibrary(Library.add(pgn, game.headers || {}));
+      }
 
       renderPlayers();
       renderMoveList();
